@@ -79,8 +79,8 @@ int jogIndex = 2;
 bool zJog = 0;
 bool laserStatus = 0;
 const int updateInterval = 198;
-bool doorValue = 0;
-bool lastDoorValue = 1;
+bool doorValue = 1;
+bool lastDoorValue = 0;
 
 bool doorUpdated = false;
 bool xyUpdated = true;
@@ -140,14 +140,14 @@ void tftUpdate(bool active) {
     }
   } 
 
-  if(lastmState != mState && mState != Door){
+  if(lastmState != mState){
     if (mState == Alarm || mState == Unknwn)
       tftPrintBig(TFT_DARKRED, TFT_BLACK, 160, 220, 120, sbuf);
     else if (mState == Hold)
       tftPrintBig(TFT_ORANGE, TFT_BLACK, 160, 220, 120, sbuf);
     else if (mState == Run || mState == Jog)
       tftPrintBig(TFT_BLACK, TFT_ORANGE, 160, 220, 120, sbuf);
-    else tftPrintBig(TFT_BLACK, TFT_MEDIUMGREEN, 160, 220, 120, sbuf);
+    else if (mState != Door) tftPrintBig(TFT_BLACK, TFT_MEDIUMGREEN, 160, 220, 120, sbuf);
     lastmState = mState;
   }
   
