@@ -60,13 +60,13 @@ I made some vinyl stickers to easily identify the button functions - They didn't
 # How to operate
 The functions are more specific to a Laser than a spindle CNC machine. Hence, the functions have been cut down.
 
-Directional controls - Move the gantry in the appropriate directions[^1]
-Pressing Z will swap to Z axis movement (only), press again to go back to X/Y mode
-Home Button - Issues $H command, for me, this is only X/Y
-Zhome - $HZ
-Unlock - Similar to the function from the original Fluid-Controller where it sends commands appropriate for the state of the machine to 'unlock' or otherwise 'resume' an Idle state.
-Laser - Issues a GRBL command to turn on a digital output.
-+/- - Increases or decreases the jog distance.
+* Directional controls - Move the gantry in the appropriate directions[^1]
+* Pressing Z will swap to Z axis movement (only), press again to go back to X/Y mode
+* Home Button - Issues $H command, for me, this is only X/Y
+* Zhome - $HZ
+* Unlock - Similar to the function from the original Fluid-Controller where it sends commands appropriate for the state of the machine to 'unlock' or otherwise 'resume' an Idle state.
+* Laser - Issues a GRBL command to turn on a digital output.
+* +/- - Increases or decreases the jog distance.
 
 [^1]: Direction will need to be verified for your machine depending on origin etc.
 
