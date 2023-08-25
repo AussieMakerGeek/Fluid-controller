@@ -4,7 +4,7 @@ This is a fork of the original Fluid controller but it only retains handfulls of
 # Main functions
 My implementation uses STM32 Bluepill over direct serial with the MKS-Tinybee using the new secondary serial function in FluidNC. I use the wifi function so bluetooth is not ideal for me, plus I can build this into my machine, no batteries etc.
 
-Display shows: 
+# Display shows 
 Machine coordinates, Work coordinates, Machine status, jog distance and whether X/Y jog or Z jog is active.  Since my machine has a visible laser, I also added a display for it's status.
 
 Main functions of buttons: 
