@@ -41,14 +41,21 @@ define TFT_CS   PA4
 ```
 It also uses the Multibutton library, but there is an issue in the library for STM32 - you need to eliminate the specific STM32 ifdef's (pinmode call) in PinButton.h or it will not compile.
 
-<!-- # Panel
+# Panel
+![Front](/Images/2023-08-25_14h56_07.png)
+![Back](/Images/2023-08-25_14h55_12.png)
+![Front2](/Images/2023-08-25_14h56_35.png)
 
+See STL folder for printable file.
+
+<!--
 <img width="440" alt="pendantV2case_lid2" src="https://user-images.githubusercontent.com/20277013/214568520-32bf0ae3-2ae2-4814-8294-004ee3288210.png">
 <img width="440" alt="pendantV2lid_case" src="https://user-images.githubusercontent.com/20277013/214570138-59b09fc4-4332-4c2e-8d71-3366ad1cf684.png">
 -->
 
 # Assembly
 I just added all of the buttons to the panel and used my soldering iron to slightly melt the edges of the plastic to hold them in.  The LCD is held in place with some tape and the BluePill is secured to the back of it with some double sided tape.
+I made some vinyl stickers to easily identify the button functions - They didn't turn out perfect but it'll do till my OCD takes over.
 
 # How to operate
 The functions are more specific to a Laser than a spindle CNC machine. Hence, the functions have been cut down.
