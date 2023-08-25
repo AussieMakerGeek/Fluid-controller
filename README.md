@@ -1,109 +1,81 @@
 # Fluid-controller
-A wireless battery powered pendant for FluidNC based on esp32
-
-![20230125_140826](https://user-images.githubusercontent.com/20277013/214572050-37decb40-87fa-4ef0-94c6-3ae00d252642.jpg)
-
+This is a fork of the original Fluid controller but it only retains handfulls of code and implements simple features for controlling my Gravoraph LS800 Co2 Laser that I converted using an MKS-Tinybee 
 
 # Main functions
+My implementation uses STM32 Bluepill over direct serial with the MKS-Tinybee using the new secondary serial function in FluidNC. I use the wifi function so bluetooth is not ideal for me, plus I can build this into my machine, no batteries etc.
+
 Display shows: 
-Machine coördinates, Work coördinates, Spindle speed and state, Set speed and step size when using joystick and rotation encoder, Overrides (Speed, Feed, Rapid),	Machine state, Battery state, Current buttons functions
+Machine coordinates, Work coordinates, Machine status, jog distance and whether X/Y jog or Z jog is active.  Since my machine has a visible laser, I also added a display for it's status.
 
-Main functions buttons, joystick and dial: 
-Wake up, Jog gantry and spindle via joystick and/or dial, Set Jog step size and speed via dial, Set spindle speed and switch on/off,	Set overrides (Speed, Feed, Rapid),	Cancel/abort job.
+Main functions of buttons: 
+Home, Home Z, Unlock/Reset, Visible laser, Jog distance +, Jog distance -, directional buttons and Z/XY toggle.
 
-Main functions menu: 
-Home machine, Zero workcoördinates, Go to zero, Probe.
+No menus...
 
 # Hardware
-1. LilyGO TTGO T-Display V1.1 which is a developmentboard with an ESP32, with a built-in tft (IPS) display and battery-charger. I purchased it for about €13 from internet.
-2. Rotary encoder / dial (about €1)
-3. Three simple colored buttons NO (total of €2)
-4. PSP joystick (about €3)
-5. Lion 18650 battery (€7)
-6. Single-sided pcb
-7. PLA (25 meter)
+1. STM32 Bluepill (128k used, about 50% free)
+2. ILI9341 based 2.5" display (320x240 res)
+3. 11 X TTP223 Touch buttons - The Pad 'A' will need to be shorted to make them active LOW.
 
-# Schematic and PCB
-
-The pcb only holds the TTGO developmentboard and the rotary-encoder. The other components are mounted on the lid and wired to the pcb. The schematic of the pcb (in Kicad) is therefore very simple. The isolation-routing of the PCB was done with the very same CNC-router I made this controller for. To fit in the joystick, a corner of the PCB had to be sawed of (of course I shoud have done this in Kicad but forgot to).
-
-The three buttons are at one side connected to the ground (all to J1.1) and are connected tot J1.2, J1.3 and J1.4 respectively.
-The joystick is connected tot J2 with J2.2 unconnected (since I later decided to wire the VCC of the joystick tot an output-pin).
+# Wiring
+The buttons and display were directly wired to the Bluepill, no need for PCB. Mounted in a 3d Printed panel for install to the machine.
 
 # Programming
+Programming is done in Arduino IDE. All code exists in one single file. Button definitions set out the pins used.  
 
-Programming is done in Arduino IDE. All code exists in one single file. Most constants are enumerated or set with defines at the beginning. I hope it will explain itself to some extent.
+Project uses the TFT_eSPI library which requires setting the display parameters in user_setup.h in the library folder:
+```
+#define STM32
+#define ILI9341_DRIVER
+#define TFT_SPI_PORT
+#define TFT_MOSI PA7
+#define TFT_MISO PA6
+#define TFT_SCLK PA5
+define TFT_CS   PA4
+#define TFT_DC   PA2
+#define TFT_RST  PA3
+#define LOAD_GFXFF
+#define SMOOTH_FONT
+#define SPI_FREQUENCY  55000000
+#define SPI_READ_FREQUENCY  20000000 //Not used
+```
+It also uses the Multibutton library, but there is an issue in the library for STM32 - you need to eliminate the specific STM32 ifdef's (pinmode call) in PinButton.h or it will not compile.
 
-Compile with partition scheme minimal SPIFFS or it will not fit.
-
-# Case
+<!-- # Panel
 
 <img width="440" alt="pendantV2case_lid2" src="https://user-images.githubusercontent.com/20277013/214568520-32bf0ae3-2ae2-4814-8294-004ee3288210.png">
 <img width="440" alt="pendantV2lid_case" src="https://user-images.githubusercontent.com/20277013/214570138-59b09fc4-4332-4c2e-8d71-3366ad1cf684.png">
+-->
 
 # Assembly
-
-Schematic drawing of the lid with positioning of the components (excl. battery).
-
-![afbeelding](https://user-images.githubusercontent.com/20277013/214533466-feb4534e-7402-42ab-9b6a-d86a29457133.png)
-
-Female headers and the rotary encoder are soldered on the pcb. The other components are connected to the PCB with wires. Plus and minus wires are directly soldered to the battery and connected to the TTGO with a JST-connector.
-
-![inside1](https://user-images.githubusercontent.com/20277013/214524701-8da7550d-7ca5-4af7-9b36-db64cc68cfa0.jpg)
-
-To further reduce the powerconsumption I decided to feed the joystick via an outputpin of the esp32, which is why you see the red wire soldered on later.
-
-![inside2](https://user-images.githubusercontent.com/20277013/214524742-b8a347a4-dc82-47c2-a12c-f6e3894d6a2d.jpg)
-
-The battery is wired to the JST-connector on the TTGO
+I just added all of the buttons to the panel and used my soldering iron to slightly melt the edges of the plastic to hold them in.  The LCD is held in place with some tape and the BluePill is secured to the back of it with some double sided tape.
 
 # How to operate
+The functions are more specific to a Laser than a spindle CNC machine. Hence, the functions have been cut down.
 
-The functions of the pendant were tailored to my needs. Below an oversight of the functions of the various buttons and button-combinations and the menu-options. It might be somewhat cryptic but I hope it may help.
+Directional controls - Move the gantry in the appropriate directions[^1]
+Pressing Z will swap to Z axis movement (only), press again to go back to X/Y mode
+Home Button - Issues $H command, for me, this is only X/Y
+Zhome - $HZ
+Unlock - Similar to the function from the original Fluid-Controller where it sends commands appropriate for the state of the machine to 'unlock' or otherwise 'resume' an Idle state.
+Laser - Issues a GRBL command to turn on a digital output.
++/- - Increases or decreases the jog distance.
 
-JS=Joystick, BD=dial, BR=red button, BG=green button, BY=yellow button
+[^1]: Direction will need to be verified for your machine depending on origin etc.
 
-Switch the pendant on: press JS
+# Other
+Serial2 (PB11 / PB10) is used for communication with the machine, Serial(1) (PA9 / PA10) is used for debug output and is not required for operation.
 
-Reset the pendant: press JS
+FluidNC will need a line in the config file to enable the second serial terminal:
 
-The pendant powers off after some time when idle or via the appropriate menu-option.
+```
+uart1:
+  txd_pin: gpio.17
+  rxd_pin: gpio.16
+  baud: 115200
+  mode: 8N1
 
-
-The pendant can either be in home-state (PH) or menu-state (PM).
-
-Function of the dial-knob can be changed by rotating the dial while pressing BG.
-
-Functions can be (default is DJ; function is indicated on the display with a blue circle):
-- DX: Jog 1 step X-axis
-- DY: Jog 1 step Y-axis
--	DZ: Jog 1 step Z-axis
--	DS: Set spindle-speed
--	DJ: set jogspeed and step-size
--	DOF: set override Feed
--	DOS: set override Speed
--	DOR: set override Rapid
-
-The function of the buttons depend on the machine-state (MS, shown in the middle of the display of the pendant; function of BR, BG, BY shown on the bottom line of the display). They are as follows.
-
-PH:
-  -	JS + MS=Idle or MS=Jog:
-    -	Up/down: jog Y-axis
-    -	Left/Right: jog X-axis
-  -	JS + MS=Idle or MS=Jog + BR (keep pressed)
-    -	Up/down: jog Z-axis
-    -	Left/Right: no function
-  -	BG: enter PM
-  -	BY: abort machine-operation
-  -	BG (keep pressed) + BD: Change function dial-knob
-  -	BR + MS=Alarm: Unlock Machine
-  -	BR + DS: Spindle on/off
-
-PM:
-  -	BD: navigate menu (poweroff, spindlespeed, spindle on/off, small/large steps for changing jogspeed/stepsize, exit menu, home the machine, Set current Work XY-position to zero, Set current Work Z-position to zero, Probe Z-axis, Jog machine to XY-position zero, unlock Machine (grbl), reset Machine (grbl), Set and save brightness).
-  -	BG: confirm menu-choice
-  -	BR: Cancel
-  -	BR (long press): poweroff
-
-## OTA
-Powering on the pendant while keeping the the red button pressed will start Wifi and activate OTA (Over The Air programming from within Arduino).
+uart_channel1:
+  uart_num: 1
+```
+See http://wiki.fluidnc.com/en/config/uart_sections for more info
